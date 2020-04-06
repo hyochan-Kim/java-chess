@@ -37,9 +37,7 @@ public class ChessBoard implements Publishable {
         return Collections.unmodifiableMap(chessBoard);
     }
 
-    public void move(String sourceKey, String targetKey) {
-        Coordinate source = Coordinate.of(sourceKey);
-        Coordinate target = Coordinate.of(targetKey);
+    public void move(Coordinate source, Coordinate target) {
 
         if (!canMove(source, target)) {
             throw new IllegalArgumentException("That piece can not move to target.");

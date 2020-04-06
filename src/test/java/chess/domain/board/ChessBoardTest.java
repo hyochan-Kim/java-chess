@@ -23,7 +23,7 @@ class ChessBoardTest {
         ChessBoard chessBoard = BoardGenerator.create();
         Chess chess = new Chess(chessBoard);
 
-        assertThatThrownBy(() -> chessBoard.move(sourceKey, targetKey))
+        assertThatThrownBy(() -> chessBoard.move(Coordinate.of(sourceKey), Coordinate.of(targetKey)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

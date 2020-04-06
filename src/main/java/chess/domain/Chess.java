@@ -21,7 +21,7 @@ public class Chess implements Observable {
         chessBoard.subscribe(this);
     }
 
-    public void move(String source, String target) {
+    public void move(Coordinate source, Coordinate target) {
         chessBoard.move(source, target);
     }
 

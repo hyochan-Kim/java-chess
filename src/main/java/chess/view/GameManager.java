@@ -2,6 +2,7 @@ package chess.view;
 
 import chess.domain.Chess;
 import chess.domain.board.BoardGenerator;
+import chess.domain.coordinate.Coordinate;
 
 import java.util.Objects;
 
@@ -55,7 +56,7 @@ public class GameManager {
     private void move(String command) {
         String source = command.split(DELIMITER)[SOURCE_INDEX];
         String target = command.split(DELIMITER)[TARGET_INDEX];
-        chess.move(source, target);
+        chess.move(Coordinate.of(source), Coordinate.of(target));
         isNotEnd = chess.isKingAlive();
     }
 

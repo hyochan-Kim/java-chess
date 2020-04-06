@@ -1,40 +1,36 @@
 package chess.dto;
 
+import chess.domain.coordinate.Coordinate;
+
 public class MoveDto {
     private int moveId;
-    private int gameId;
-    private String source;
-    private String target;
+    private int roomId;
+    private Coordinate source;
+    private Coordinate target;
+
+    public MoveDto(int roomId, Coordinate source, Coordinate target) {
+        this.roomId = roomId;
+        this.source = source;
+        this.target = target;
+    }
 
     public int getMoveId() {
         return moveId;
     }
 
-    public void setMoveId(int moveId) {
-        this.moveId = moveId;
-    }
-
-    public int getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-    }
-
-    public String getSource() {
+    public Coordinate getSource() {
         return source;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public int getRoomId() {
+        return roomId;
     }
 
-    public String getTarget() {
+    public Coordinate getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
+    public void setMoveId(int moveId) {
+        this.moveId = moveId;
     }
 }

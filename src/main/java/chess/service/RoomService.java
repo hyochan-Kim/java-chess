@@ -1,47 +1,97 @@
 package chess.service;
 
-import chess.domain.Chess;
-import chess.domain.board.BoardGenerator;
-import chess.domain.room.Room;
+import chess.dto.RoomDto;
 import chess.repository.CachedRoomRepository;
 import chess.repository.RoomRepository;
 import chess.result.Result;
 
+import java.sql.SQLException;
+
 public class RoomService {
+    private static final int DEFAULT_VALUE = -1;
+
     private RoomRepository roomRepository = new CachedRoomRepository();
 
-    public Result create(String roomName, int userId) {
-        Chess chess = new Chess(BoardGenerator.create());
-        Room room = new Room(chess, roomName, userId);
-        return roomRepository.create(room);
+    public Result create(RoomDto roomDto) {
+        try {
+            return roomRepository.create(roomDto);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
+        }
     }
 
-
     public Result join(String roomName, int userId) {
-        Result result = roomRepository.findByName(roomName);
-        if (!result.isSuccess()) {
-            throw new IllegalArgumentException("Can not find room. Room name : " + roomName);
+        Result result;
+        try {
+            result = roomRepository.findByName(roomName);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
         }
-        Room room = (Room) result.getObject();
-        room.join(userId);
-        return roomRepository.update(room);
+
+        if (!result.isSuccess()) {
+            return new Result(false, "Can not find room. Room name : " + roomName);
+        }
+        RoomDto roomDto = (RoomDto) result.getObject();
+
+        if (roomDto.getWhiteUserId() == DEFAULT_VALUE) {
+            roomDto.setWhiteUserId(userId);
+        } else if (roomDto.getBlackUserId() == DEFAULT_VALUE) {
+            roomDto.setBlackUserId(userId);
+        } else {
+            return new Result(false, "Room is full");
+        }
+
+        try {
+            return roomRepository.update(roomDto);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
+        }
     }
 
     public Result exit(int roomId, int userId) {
-        Result result = roomRepository.findById(roomId);
-        if (!result.isSuccess()) {
-            throw new IllegalArgumentException("Can not find room.");
+        Result result;
+        try {
+            result = roomRepository.findById(roomId);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
         }
-        Room room = (Room) result.getObject();
-        room.exit(userId);
-        return roomRepository.update(room);
+
+        if (!result.isSuccess()) {
+            return new Result(false, "Can not find room. Room id : " + roomId);
+        }
+        RoomDto roomDto = (RoomDto) result.getObject();
+
+        if (roomDto.getWhiteUserId() == userId) {
+            roomDto.setWhiteUserId(DEFAULT_VALUE);
+        } else if (roomDto.getBlackUserId() == userId) {
+            roomDto.setBlackUserId(DEFAULT_VALUE);
+        } else {
+            return new Result(false, "id : " + userId + "is not in this room.");
+        }
+
+        try {
+            return roomRepository.update(roomDto);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
+        }
     }
 
     public Result quit(int roomId) {
-        Result result = roomRepository.findById(roomId);
-        if (!result.isSuccess()) {
-            throw new IllegalArgumentException("Can not find room.");
+        Result result;
+        try {
+            result = roomRepository.findById(roomId);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
         }
-        return roomRepository.delete(roomId);
+
+        if (!result.isSuccess()) {
+            return new Result(false, "Can not find room. Room id : " + roomId);
+        }
+
+        try {
+            return roomRepository.delete(roomId);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
+        }
     }
 }

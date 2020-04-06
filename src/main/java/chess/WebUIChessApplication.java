@@ -26,9 +26,7 @@ public class WebUIChessApplication {
         post("/room/exit", roomController::exit);
         post("/room/quit", roomController::quit);
 
-        get("/chess/refresh", chessController::refresh);
-        post("/chess/end", chessController::end);
-        post("/chess/surrender", chessController::surrender);
+        get("/chess/renew", chessController::renew);
         post("/chess/way", chessController::getMovableWay);
         post("/chess/move", chessController::move);
     }

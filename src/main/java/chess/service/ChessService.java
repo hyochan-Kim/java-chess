@@ -1,94 +1,99 @@
 package chess.service;
 
-import chess.WebUIChessApplication;
 import chess.domain.Chess;
+import chess.domain.board.BoardGenerator;
 import chess.domain.board.Tile;
 import chess.domain.coordinate.Coordinate;
 import chess.domain.piece.Team;
-import chess.dto.BoardDto;
-import chess.repository.CachedChessRepository;
-import chess.repository.ChessRepository;
+import chess.dto.ChessDto;
+import chess.dto.MoveDto;
+import chess.repository.MoveRepository;
+import chess.repository.MoveRepositoryImpl;
 import chess.result.Result;
 import chess.view.PieceRender;
 import com.google.gson.Gson;
-import spark.Request;
-import spark.Response;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ChessService {
-    private ChessRepository chessRepository = new CachedChessRepository();
+    private MoveRepository moveRepository = new MoveRepositoryImpl();
+    private Map<Integer, Chess> cachedChess = new HashMap<>();
 
-    public static Object surrender(Request request, Response response) {
-        int gameId = Integer.parseInt(request.queryParams("gameId"));
-        if (!gameMap.containsKey(gameId)) {
-            throw new IllegalArgumentException("Invalid gameId");
+    public Result move(MoveDto moveDto) {
+        if (!cachedChess.containsKey(moveDto.getRoomId())) {
+            return new Result(false, "Can not find chess. chess id : " + moveDto.getRoomId());
         }
-        gameMap.remove(gameId);
-
-        Map<String, Object> model = new HashMap<>();
-        return WebUIChessApplication.render(model, "result.html");
-    }
-
-    public static Object end(Request request, Response response) {
-        int gameId = Integer.parseInt(request.queryParams("gameId"));
-        if (!gameMap.containsKey(gameId)) {
-            throw new IllegalArgumentException("Invalid gameId");
-        }
-        Chess chess = gameMap.get(gameId);
-        gameMap.put(gameId, chess);
-        Map<String, Object> model = new HashMap<>();
-        return WebUIChessApplication.render(model, "index.html");
-    }
-
-    public static Object move(Request request, Response response) {
-        int gameId = Integer.parseInt("0");
-        Chess chess = gameMap.get(gameId);
-        chess.move(request.queryParams("source"), request.queryParams("target"));
+        Chess chess = cachedChess.get(moveDto.getRoomId());
+        chess.move(moveDto.getSource(), moveDto.getTarget());
         if (!chess.isKingAlive()) {
-            return "win";
+            return new Result(true, "win");
         }
-        gameMap.put(gameId, chess);
-        return new Gson().toJson(makeBoardDto(gameId, chess));
+        try {
+            return moveRepository.add(moveDto);
+        } catch (SQLException e) {
+            return new Result(false, "SQLException occur.");
+        }
     }
 
-    private static BoardDto makeBoardDto(int gameId, Chess chess) {
-        Map<String, String> test = new HashMap<>();
-        for (Map.Entry<Coordinate, Tile> entry : chess.getChessBoard().entrySet()) {
-            test.put(entry.getKey().toString(), PieceRender.findTokenByPiece(entry.getValue().getPiece()));
+    public Result getMovableWay(int roomId, Team team, Coordinate coordinate) {
+        if (!cachedChess.containsKey(roomId)) {
+            return new Result(false, "Can not find chess. chess id : " + roomId);
         }
-        return new BoardDto(test,
-                gameId, chess.getCurrentTeam(),
-                chess.calculateBlackScore(), chess.calculateWhiteScore(), chess.getPlayerCount());
-    }
-
-    public Result getMovableWay(int chessId, Team team, Coordinate coordinate) {
-
-        Result result = chessRepository.findById(chessId);
-        if (!result.isSuccess()) {
-            throw new IllegalArgumentException("Can not find chess. chess id : " + chessId);
-        }
-        Chess chess = (Chess) result.getObject();
+        Chess chess = cachedChess.get(roomId);
         if (!chess.isTurnOf(team) || chess.isTurnOf(coordinate)) {
-            throw new IllegalArgumentException("not your turn");
+            return new Result(false, "not your turn");
         }
 
         List<String> movableWay = chess.getMovableWay(coordinate);
         return new Result(true, new Gson().toJson(movableWay));
     }
 
-    public Result refresh(int chessId) {
-        Result result = chessRepository.findById(chessId);
-        if (!result.isSuccess()) {
-            throw new IllegalArgumentException("Can not find chess. chess id : " + chessId);
+    public Result renew(int roomId) {
+        if (!cachedChess.containsKey(roomId)) {
+            load(roomId);
         }
-        Chess chess = (Chess) result.getObject();
+        if (!cachedChess.containsKey(roomId)) {
+            create(roomId);
+        }
+        Chess chess = cachedChess.get(roomId);
         if (!chess.isKingAlive()) {
             return new Result(true, "lose");
         }
-        return new Result(true, new Gson().toJson(makeBoardDto(chessId, chess)));
+        return new Result(true, new Gson().toJson(makeChessDto(chess)));
     }
 
+    private void create(int roomId) {
+        Chess chess = new Chess(BoardGenerator.create());
+        cachedChess.put(roomId, chess);
+    }
+
+    private void load(int roomId) {
+        Chess chess = new Chess(BoardGenerator.create());
+       /* List<MoveDto> moveDtos = (List<MoveDto>) moveRepository.findByRoomId(roomId).getObject();
+        for (MoveDto moveDto : moveDtos) {
+            chess.move(moveDto.getSource(), moveDto.getTarget());
+        }
+       */
+        cachedChess.put(roomId, chess);
+    }
+
+    private ChessDto makeChessDto(Chess chess) {
+        ChessDto chessDto = new ChessDto();
+        chessDto.setBlackScore(chess.calculateBlackScore());
+        chessDto.setWhiteScore(chess.calculateWhiteScore());
+        chessDto.setBoard(makeBoardToString(chess));
+        chessDto.setTeam(chess.getCurrentTeam());
+        return chessDto;
+    }
+
+    private Map<String, String> makeBoardToString(Chess chess) {
+        Map<String, String> boardInfo = new HashMap<>();
+        for (Map.Entry<Coordinate, Tile> entry : chess.getChessBoard().entrySet()) {
+            boardInfo.put(entry.getKey().toString(), PieceRender.findTokenByPiece(entry.getValue().getPiece()));
+        }
+        return boardInfo;
+    }
 }

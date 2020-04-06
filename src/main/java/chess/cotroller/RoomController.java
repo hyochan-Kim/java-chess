@@ -1,5 +1,6 @@
 package chess.cotroller;
 
+import chess.dto.RoomDto;
 import chess.service.RoomService;
 import chess.utils.validator.RoomValidator;
 import spark.Request;
@@ -15,7 +16,11 @@ public class RoomController {
         RoomValidator.checkRoomName(roomName);
         RoomValidator.checkUserId(userId);
 
-        return roomService.create(roomName, userId);
+        RoomDto roomDto = new RoomDto();
+        roomDto.setWhiteUserId(userId);
+        roomDto.setName(roomName);
+
+        return roomService.create(roomDto);
     }
 
     public Object join(Request request, Response response) {

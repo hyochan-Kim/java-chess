@@ -1,27 +1,44 @@
 package chess;
 
-import chess.cotroller.GameController;
+import chess.cotroller.ChessController;
+import chess.cotroller.RoomController;
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static spark.Spark.*;
 
 public class WebUIChessApplication {
     public static void main(String[] args) {
+        RoomController roomController = new RoomController();
+        ChessController chessController = new ChessController();
+
         staticFiles.location("/templates");
-        get("/", GameController::index);
-        get("/start", GameController::start);
-        post("/load", GameController::load);
-        post("/refresh", GameController::refresh);
-        post("/end", GameController::end);
-        post("/surrender", GameController::surrender);
-        post("/way", GameController::way);
-        post("/move", GameController::move);
+
+        get("/", WebUIChessApplication::index);
+
+        post("/room/create", roomController::create);
+        post("/room/join", roomController::join);
+        post("/room/exit", roomController::exit);
+        post("/room/quit", roomController::quit);
+
+        get("/chess/refresh", chessController::refresh);
+        post("/chess/end", chessController::end);
+        post("/chess/surrender", chessController::surrender);
+        post("/chess/way", chessController::getMovableWay);
+        post("/chess/move", chessController::move);
     }
 
     public static String render(Map<String, Object> model, String templatePath) {
         return new HandlebarsTemplateEngine().render(new ModelAndView(model, templatePath));
+    }
+
+    public static Object index(Request request, Response response) {
+        Map<String, Object> model = new HashMap<>();
+        return WebUIChessApplication.render(model, "index.html");
     }
 }

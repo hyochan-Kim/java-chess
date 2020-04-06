@@ -1,9 +1,9 @@
 package chess.domain.board;
 
+import chess.domain.Chess;
 import chess.domain.coordinate.Coordinate;
 import chess.domain.coordinate.File;
 import chess.domain.coordinate.Rank;
-import chess.domain.manager.ChessManager;
 import chess.domain.piece.Pieces;
 import chess.domain.piece.Team;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ class ChessBoardTest {
     void moveTest(String sourceKey, String targetKey) {
         //given
         ChessBoard chessBoard = BoardGenerator.create();
-        ChessManager chessManager = new ChessManager(chessBoard);
+        Chess chess = new Chess(chessBoard);
 
         assertThatThrownBy(() -> chessBoard.move(sourceKey, targetKey))
                 .isInstanceOf(IllegalArgumentException.class);

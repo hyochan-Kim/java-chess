@@ -1,4 +1,4 @@
-package chess.domain.manager;
+package chess.domain;
 
 import chess.domain.board.ChessBoard;
 import chess.domain.board.Tile;
@@ -11,13 +11,12 @@ import chess.domain.piece.Team;
 import java.util.List;
 import java.util.Map;
 
-public class ChessManager implements Observable {
+public class Chess implements Observable {
     private final ChessBoard chessBoard;
     private Team currentTeam = Team.WHITE;
     private boolean isKingAlive = true;
-    private int playerCount = 0;
 
-    public ChessManager(final ChessBoard chessBoard) {
+    public Chess(final ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
         chessBoard.subscribe(this);
     }
@@ -34,12 +33,8 @@ public class ChessManager implements Observable {
         return this.currentTeam.equals(team);
     }
 
-    public void countUpPlayer() {
-        playerCount++;
-    }
-
-    public void countDownPlayer() {
-        playerCount--;
+    public boolean isTurnOf(Coordinate source) {
+        return chessBoard.isNotSameTeam(source, currentTeam);
     }
 
     public List<String> getMovableWay(Coordinate sourceCoordinate) {
@@ -64,14 +59,6 @@ public class ChessManager implements Observable {
 
     public Team getCurrentTeam() {
         return currentTeam;
-    }
-
-    public int getPlayerCount() {
-        return playerCount;
-    }
-
-    public boolean isNotSameTeam(String source) {
-        return chessBoard.isNotSameTeam(source, currentTeam);
     }
 
     @Override

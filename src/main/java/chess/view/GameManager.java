@@ -1,7 +1,7 @@
 package chess.view;
 
+import chess.domain.Chess;
 import chess.domain.board.BoardGenerator;
-import chess.domain.manager.ChessManager;
 
 import java.util.Objects;
 
@@ -9,7 +9,7 @@ public class GameManager {
     public static final int SOURCE_INDEX = 1;
     public static final int TARGET_INDEX = 2;
     public static final String DELIMITER = " ";
-    private ChessManager chessManager;
+    private Chess chess;
     private boolean isNotEnd;
 
     public GameManager() {
@@ -32,7 +32,7 @@ public class GameManager {
         if (command == Command.END) {
             end();
         }
-        if (Objects.isNull(chessManager)) {
+        if (Objects.isNull(chess)) {
             return;
         }
         if (command == Command.MOVE) {
@@ -41,11 +41,11 @@ public class GameManager {
         if (command == Command.STATUS) {
             status();
         }
-        OutputView.showChessBoard(this.chessManager.getChessBoard());
+        OutputView.showChessBoard(this.chess.getChessBoard());
     }
 
     private void start() {
-        this.chessManager = new ChessManager(BoardGenerator.create());
+        this.chess = new Chess(BoardGenerator.create());
     }
 
     private void end() {
@@ -55,12 +55,12 @@ public class GameManager {
     private void move(String command) {
         String source = command.split(DELIMITER)[SOURCE_INDEX];
         String target = command.split(DELIMITER)[TARGET_INDEX];
-        chessManager.move(source, target);
-        isNotEnd = chessManager.isKingAlive();
+        chess.move(source, target);
+        isNotEnd = chess.isKingAlive();
     }
 
     private void status() {
-        OutputView.showScore(this.chessManager.getCurrentTeam(),
-                this.chessManager.calculateCurrentTeamScore());
+        OutputView.showScore(this.chess.getCurrentTeam(),
+                this.chess.calculateCurrentTeamScore());
     }
 }

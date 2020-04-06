@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     $('.btn-makeRoom').click(async function () {
+        gameName = $('#makeRoomName').val()
         $.ajax({
             type: "GET",
             url: "/start",
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     $('.btn-joinRoom').click(async function () {
-        gameId = $('#gameId').val()
+        gameName = $('#joinRoomName').val()
         $.ajax({
             type: "POST",
             url: "/load",

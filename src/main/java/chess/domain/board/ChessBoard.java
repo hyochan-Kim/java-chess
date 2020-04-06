@@ -87,8 +87,8 @@ public class ChessBoard implements Publishable {
         this.chessBoard.put(tile.getCoordinate(), tile);
     }
 
-    public boolean isNotSameTeam(final String source, final Team currentTeam) {
-        Tile tile = this.chessBoard.get(Coordinate.of(source));
+    public boolean isNotSameTeam(final Coordinate source, final Team currentTeam) {
+        Tile tile = this.chessBoard.get(source);
         return !tile.isSameTeam(currentTeam);
     }
 

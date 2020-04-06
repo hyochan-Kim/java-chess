@@ -1,10 +1,7 @@
 package chess.view;
 
-import chess.manager.ChessManager;
-
 import java.util.Arrays;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum Command {
@@ -36,8 +33,8 @@ public enum Command {
         public static boolean isStatus(String command) {
             return "status".equalsIgnoreCase(command);
         }
-        
-        public static Command findBy(String value) {
+
+    public static Command findBy(String value) {
             return Arrays.stream(Command.values())
                     .filter(command -> command.compare.test(value))
                     .findFirst()

@@ -1,7 +1,7 @@
 package chess.view;
 
-import chess.board.BoardGenerator;
-import chess.manager.ChessManager;
+import chess.domain.board.BoardGenerator;
+import chess.domain.manager.ChessManager;
 
 import java.util.Objects;
 

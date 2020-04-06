@@ -20,7 +20,7 @@ class ChessBoardTest {
     @CsvSource(value = {"b1,c4", "b1,c9", "a1,a3", "a7,a2"})
     void moveTest(String sourceKey, String targetKey) {
         //given
-        ForwardChessBoard chessBoard = BoardGenerator.create();
+        ChessBoard chessBoard = BoardGenerator.create();
         ChessManager chessManager = new ChessManager(chessBoard);
 
         assertThatThrownBy(() -> chessBoard.move(sourceKey, targetKey))

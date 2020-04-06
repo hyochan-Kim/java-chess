@@ -1,6 +1,6 @@
 package chess.domain.manager;
 
-import chess.domain.board.ForwardChessBoard;
+import chess.domain.board.ChessBoard;
 import chess.domain.board.Tile;
 import chess.domain.coordinate.Coordinate;
 import chess.domain.observer.Observable;
@@ -8,31 +8,42 @@ import chess.domain.piece.King;
 import chess.domain.piece.Piece;
 import chess.domain.piece.Team;
 
+import java.util.List;
 import java.util.Map;
 
 public class ChessManager implements Observable {
-    private final ForwardChessBoard chessBoard;
+    private final ChessBoard chessBoard;
     private Team currentTeam = Team.WHITE;
     private boolean isKingAlive = true;
+    private int playerCount = 0;
 
-    public ChessManager(final ForwardChessBoard chessBoard) {
+    public ChessManager(final ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
         chessBoard.subscribe(this);
     }
 
     public void move(String source, String target) {
-        if (chessBoard.isNotSameTeam(source, currentTeam)) {
-            return;
-        }
-        try {
-            chessBoard.move(source, target);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
+        chessBoard.move(source, target);
     }
 
     public Map<Coordinate, Tile> getChessBoard() {
         return chessBoard.getChessBoard();
+    }
+
+    public boolean isTurnOf(Team team) {
+        return this.currentTeam.equals(team);
+    }
+
+    public void countUpPlayer() {
+        playerCount++;
+    }
+
+    public void countDownPlayer() {
+        playerCount--;
+    }
+
+    public List<String> getMovableWay(Coordinate sourceCoordinate) {
+        return chessBoard.getMovableWay(sourceCoordinate);
     }
 
     public double calculateCurrentTeamScore() {
@@ -53,6 +64,14 @@ public class ChessManager implements Observable {
 
     public Team getCurrentTeam() {
         return currentTeam;
+    }
+
+    public int getPlayerCount() {
+        return playerCount;
+    }
+
+    public boolean isNotSameTeam(String source) {
+        return chessBoard.isNotSameTeam(source, currentTeam);
     }
 
     @Override

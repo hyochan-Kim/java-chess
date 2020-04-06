@@ -1,11 +1,11 @@
 package chess.view;
 
-import chess.board.Tile;
-import chess.coordinate.Coordinate;
-import chess.coordinate.File;
-import chess.coordinate.Rank;
-import chess.piece.Piece;
-import chess.piece.Team;
+import chess.domain.board.Tile;
+import chess.domain.coordinate.Coordinate;
+import chess.domain.coordinate.File;
+import chess.domain.coordinate.Rank;
+import chess.domain.piece.Piece;
+import chess.domain.piece.Team;
 
 import java.util.Map;
 

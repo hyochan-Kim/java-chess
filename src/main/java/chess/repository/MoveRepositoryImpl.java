@@ -3,6 +3,7 @@ package chess.repository;
 import chess.domain.coordinate.Coordinate;
 import chess.dto.MoveDto;
 import chess.result.Result;
+import chess.utils.IdGenerator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,7 @@ public class MoveRepositoryImpl implements MoveRepository {
     public Result add(MoveDto moveDto) throws SQLException {
         String query = "INSERT INTO move VALUES (?, ?, ?, ?)";
         PreparedStatement pstmt = getConnection().prepareStatement(query);
-        pstmt.setInt(1, moveDto.getMoveId());
+        pstmt.setInt(1, IdGenerator.generateMoveId());
         pstmt.setInt(2, moveDto.getRoomId());
         pstmt.setString(3, moveDto.getSource().toString());
         pstmt.setString(4, moveDto.getTarget().toString());

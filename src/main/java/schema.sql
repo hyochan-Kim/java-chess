@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `chess`.`move`
     `source`  VARCHAR(2) NOT NULL,
     `target`  VARCHAR(2) NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `room_id_idx` (`room_id` ASC) VISIBLE,
+    INDEX `room_id_idx` (`room_id` ASC),
     CONSTRAINT `room_id`
         FOREIGN KEY (`room_id`)
             REFERENCES `chess`.`room` (`id`)

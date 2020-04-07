@@ -1,51 +1,81 @@
 var click_flag = 0;
-var before_position = "";
-var after_position = "";
+var source = "";
+var target = "";
 var team = "";
 var way = "";
-var gameId = "";
+var roomId = "";
 var end_flag = false;
+var timeOutTerm = 1000;
+var playerNumber = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
 
     $(document).ready(function () {
-        gameId = location.href.substr(
+        roomId = location.href.substr(
             location.href.lastIndexOf('=') + 1
         );
     });
 
     setInterval(function () {
-        console.log(gameId)
+        console.log(roomId)
         if (!end_flag) {
             $.ajax({
-                type: "POST",
-                url: "/refresh",
-                data: {
-                    gameId: gameId
-                },
+                type: "GET",
+                url: "/room/status?roomId=" + roomId,
+                dataType: 'text',// xml, json, script, html
                 success: function (data) {
-                    if (data === "lose") {
-                        end_flag = true;
-                        printLoser()
-                    } else {
-                        console.log(data)
-                        drawBoard(data)
+                    jsonData = JSON.parse(data);
+                    if (jsonData.isEnd) {
+                        end_flag = true
+                    }
+                    playerNumber = 0
+                    console.log(jsonData)
+                    if (jsonData.blackUserId !== -1) {
+                        console.log(jsonData.blackUserId)
+                        playerNumber++
+                    }
+                    if (jsonData.whiteUserId !== -1) {
+                        console.log(jsonData.whiteUserId)
+                        playerNumber++
+                    }
+
+                    if (team === "" && playerNumber === 1) {
+                        team = "WHITE"
+                    }
+                    if (team === "" && playerNumber === 2) {
+                        team = "BLACK"
                     }
                 },
                 error: function (e) {
                     console.log(e.message);
                 }
             });
+            if (playerNumber === 2) {
+                $.ajax({
+                    type: "GET",
+                    url: "/chess/renew?roomId=" + roomId,
+                    dataType: 'text',// xml, json, script, html
+                    success: function (data) {
+                        console.log(data)
+                        drawBoard(data)
+                    },
+                    error: function (e) {
+                        console.log(e.message);
+                    }
+                });
+            } else {
+                printDelay()
+            }
         }
-    }, 1000);
+    }, timeOutTerm);
 
     $('.btn-surrender').click(function () {
         $.ajax({
             type: "POST",
-            url: "/surrender",
+            url: "/room/quit",
             async: true,
             data: {
-                gameId: gameId
+                roomId: roomId
             },
             success: function (data) {
                 console.log(data);
@@ -60,10 +90,10 @@ document.addEventListener("DOMContentLoaded", function () {
     $('.btn-end').click(function () {
         $.ajax({
             type: "POST",
-            url: "/end",
+            url: "/room/exit",
             async: true,
             data: {
-                gameId: gameId
+                roomId: roomId
             },
             success: function (data) {
                 console.log(data);
@@ -76,17 +106,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     $('.square').click(function () {
-        if (click_flag == 0) {
-            before_position = $(this).attr('id');
+        if (click_flag === 0) {
+            source = $(this).attr('id');
             $.ajax({
-                url: '/way',
+                url: '/chess/way?roomId=' + roomId + '&team=' + team + '&coordinate=' + source,
                 async: true,
-                type: 'POST',
-                data: {
-                    gameId: gameId,
-                    team: team,
-                    coordinate: before_position
-                },
+                type: 'GET',
                 dataType: 'text',// xml, json, script, html
 
                 success: function (data) {
@@ -103,16 +128,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 }// 요청의 실패, 성공과 상관 없이 완료 될 경우 호출
             });
         } else {
-            after_position = $(this).attr('id');
+            target = $(this).attr('id');
             click_flag = 0;
             removeWay();
             $.ajax({
-                url: '/move',
+                url: '/chess/move',
                 async: true,
                 type: 'POST',
                 data: {
-                    source: before_position,
-                    target: after_position
+                    roomId: roomId,
+                    source: source,
+                    target: target
                 },
                 dataType: 'text',// xml, json, script, html
 
@@ -140,39 +166,21 @@ function drawBoard(data) {
     let board = jsonData.board
     let blackScore = jsonData.blackScore
     let whiteScore = jsonData.whiteScore
-    let gameId = jsonData.gameId
-    let playerCount = jsonData.playerCount
 
-    if (team === "" && playerCount === 1) {
-        team = "WHITE"
-    }
-    if (team === "" && playerCount === 2) {
-        team = "BLACK"
-    }
     jQuery.each(board, function (key, value) {
         $(`#${key}`).html(value)
     })
 
-    if (playerCount == 1) {
-        printDelay()
-    }
-    $(`#${"gameId"}`).html(gameId)
+    $(`#${"roomId"}`).html(roomId)
     $(`#${"blackScore"}`).html(blackScore)
     $(`#${"whiteScore"}`).html(whiteScore)
 
 }
 
-function switchTurn() {
-    if (team === "BLACK") {
-        team = "WHITE"
-    } else {
-        team = "BLACK"
-    }
-}
-
 function drawWay(data) {
     let jsonData = JSON.parse(data);
     way = jsonData;
+    console.log(jsonData)
     jQuery.each(jsonData, function (key, value) {
         $(`#${value}`).css("background-color", "red")
     })

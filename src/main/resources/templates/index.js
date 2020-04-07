@@ -1,14 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     $('.btn-makeRoom').click(async function () {
-        gameName = $('#makeRoomName').val()
         $.ajax({
-            type: "GET",
-            url: "/start",
-            contentType: "application/json",
+            type: "POST",
+            url: "/room/create",
+            data: {
+                roomName: $('#makeRoomName').val(),
+                userId: $('#creatorId').val()
+            },
             success: function (data) {
-                gameId = JSON.parse(data).gameId
-                window.location.href = "board.html?id=" + gameId
+                roomId = data
+                window.location.href = "board.html?id=" + roomId
             },
             error: function (e) {
                 console.log(e.message);
@@ -17,16 +19,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     $('.btn-joinRoom').click(async function () {
-        gameName = $('#joinRoomName').val()
         $.ajax({
             type: "POST",
-            url: "/load",
+            url: "/room/join",
             data: {
-                gameId: gameId
+                roomName: $('#joinRoomName').val(),
+                userId: $('#joinerId').val()
             },
             success: function (data) {
-                console.log(data)
-                window.location.href = "board.html?id=" + gameId
+                roomId = data
+                window.location.href = "board.html?id=" + roomId
             },
             error: function (e) {
                 console.log(e.message);

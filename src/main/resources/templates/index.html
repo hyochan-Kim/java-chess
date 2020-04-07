@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -8,15 +8,17 @@
 <body>
 
 <form>
-    <h3>방 만들기</h3>
-    <input id="makeRoomName" type="text">
-    <input id="btn-makeRoom" type="button" value="방 만들기">
+    <h3>방 만들기</h3><br/>
+    user id : <input id="creatorId" type="text"> <br/>
+    room name : <input id="makeRoomName" type="text">
+    <button class="btn-makeRoom" type="button"> create</button>
 </form>
 <br/>
 <form>
-    <h3>방 참여하기</h3>
-    <input id="joinRoomName" type="text">
-    <input id="btn-joinRoom" type="text" value="참여하기">
+    <h3>방 참여하기</h3> <br/>
+    user id : <input id="joinerId" type="text"> <br/>
+    room name : <input id="joinRoomName" type="text">
+    <button class="btn-joinRoom" type="button"> join</button>
 </form>
 <script src="index.js"></script>
 </body>

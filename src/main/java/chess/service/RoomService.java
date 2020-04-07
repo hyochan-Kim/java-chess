@@ -20,6 +20,14 @@ public class RoomService {
         }
     }
 
+    public Result status(int roomId) {
+        try {
+            return roomRepository.findById(roomId);
+        } catch (SQLException e) {
+            return new Result(false, e.getMessage());
+        }
+    }
+
     public Result join(String roomName, int userId) {
         Result result;
         try {
@@ -42,10 +50,12 @@ public class RoomService {
         }
 
         try {
-            return roomRepository.update(roomDto);
+            roomRepository.update(roomDto);
         } catch (SQLException e) {
             return new Result(false, e.getMessage());
         }
+
+        return new Result(true, roomDto.getRoomId());
     }
 
     public Result exit(int roomId, int userId) {

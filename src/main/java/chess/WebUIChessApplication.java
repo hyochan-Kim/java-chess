@@ -21,13 +21,14 @@ public class WebUIChessApplication {
 
         get("/", WebUIChessApplication::index);
 
+        get("/room/status", roomController::status);
         post("/room/create", roomController::create);
         post("/room/join", roomController::join);
         post("/room/exit", roomController::exit);
         post("/room/quit", roomController::quit);
 
         get("/chess/renew", chessController::renew);
-        post("/chess/way", chessController::getMovableWay);
+        get("/chess/way", chessController::getMovableWay);
         post("/chess/move", chessController::move);
     }
 

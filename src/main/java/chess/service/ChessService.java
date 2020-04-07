@@ -1,5 +1,6 @@
 package chess.service;
 
+import chess.consoleView.PieceRender;
 import chess.domain.Chess;
 import chess.domain.board.BoardGenerator;
 import chess.domain.board.Tile;
@@ -10,8 +11,6 @@ import chess.dto.MoveDto;
 import chess.repository.MoveRepository;
 import chess.repository.MoveRepositoryImpl;
 import chess.result.Result;
-import chess.view.PieceRender;
-import com.google.gson.Gson;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class ChessService {
 
     public Result move(MoveDto moveDto) {
         if (!cachedChess.containsKey(moveDto.getRoomId())) {
-            return new Result(false, "Can not find chess. chess id : " + moveDto.getRoomId());
+            return new Result(false, "Can not find room. room id : " + moveDto.getRoomId());
         }
         Chess chess = cachedChess.get(moveDto.getRoomId());
         chess.move(moveDto.getSource(), moveDto.getTarget());
@@ -40,7 +39,7 @@ public class ChessService {
 
     public Result getMovableWay(int roomId, Team team, Coordinate coordinate) {
         if (!cachedChess.containsKey(roomId)) {
-            return new Result(false, "Can not find chess. chess id : " + roomId);
+            return new Result(false, "Can not find room. room id : " + roomId);
         }
         Chess chess = cachedChess.get(roomId);
         if (!chess.isTurnOf(team) || chess.isTurnOf(coordinate)) {
@@ -48,7 +47,7 @@ public class ChessService {
         }
 
         List<String> movableWay = chess.getMovableWay(coordinate);
-        return new Result(true, new Gson().toJson(movableWay));
+        return new Result(true, movableWay);
     }
 
     public Result renew(int roomId) {
@@ -62,7 +61,7 @@ public class ChessService {
         if (!chess.isKingAlive()) {
             return new Result(true, "lose");
         }
-        return new Result(true, new Gson().toJson(makeChessDto(chess)));
+        return new Result(true, makeChessDto(chess));
     }
 
     private void create(int roomId) {

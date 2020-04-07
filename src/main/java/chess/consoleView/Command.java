@@ -1,4 +1,4 @@
-package chess.view;
+package chess.consoleView;
 
 import java.util.Arrays;
 import java.util.function.Predicate;

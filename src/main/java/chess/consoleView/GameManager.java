@@ -1,4 +1,4 @@
-package chess.view;
+package chess.consoleView;
 
 import chess.domain.Chess;
 import chess.domain.board.BoardGenerator;

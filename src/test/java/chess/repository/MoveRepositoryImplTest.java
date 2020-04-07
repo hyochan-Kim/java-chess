@@ -30,8 +30,8 @@ class MoveRepositoryImplTest {
     @Test
     void add() throws SQLException {
         RoomDto roomDto = new RoomDto();
-        roomRepository.create(roomDto);
-        MoveDto moveDto = new MoveDto(-1, Coordinate.of("a1"), Coordinate.of("b2"));
+        int roomId = (int) roomRepository.create(roomDto).getObject();
+        MoveDto moveDto = new MoveDto(roomId, Coordinate.of("a1"), Coordinate.of("b2"));
         moveDto.setMoveId(1);
         moveRepository.add(moveDto);
         assertThat(moveRepository.findById(1).isSuccess()).isTrue();

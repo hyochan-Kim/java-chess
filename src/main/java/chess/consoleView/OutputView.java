@@ -1,4 +1,4 @@
-package chess.view;
+package chess.consoleView;
 
 import chess.domain.board.Tile;
 import chess.domain.coordinate.Coordinate;

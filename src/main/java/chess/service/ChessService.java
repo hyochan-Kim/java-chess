@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChessService {
     private MoveRepository moveRepository = new MoveRepositoryImpl();
@@ -54,9 +55,6 @@ public class ChessService {
         if (!cachedChess.containsKey(roomId)) {
             load(roomId);
         }
-        if (!cachedChess.containsKey(roomId)) {
-            create(roomId);
-        }
         Chess chess = cachedChess.get(roomId);
         if (!chess.isKingAlive()) {
             return new Result(true, "lose");
@@ -64,19 +62,22 @@ public class ChessService {
         return new Result(true, makeChessDto(chess));
     }
 
-    private void create(int roomId) {
-        Chess chess = new Chess(BoardGenerator.create());
-        cachedChess.put(roomId, chess);
-    }
-
     private void load(int roomId) {
         Chess chess = new Chess(BoardGenerator.create());
-       /* List<MoveDto> moveDtos = (List<MoveDto>) moveRepository.findByRoomId(roomId).getObject();
-        for (MoveDto moveDto : moveDtos) {
-            chess.move(moveDto.getSource(), moveDto.getTarget());
+        try {
+            Result result = moveRepository.findByRoomId(roomId);
+            if (Objects.isNull(result.getObject())) {
+                cachedChess.put(roomId, chess);
+                return;
+            }
+            List<MoveDto> moveDtos = (List<MoveDto>) result.getObject();
+            for (MoveDto moveDto : moveDtos) {
+                chess.move(moveDto.getSource(), moveDto.getTarget());
+            }
+            cachedChess.put(roomId, chess);
+        } catch (SQLException e) {
+            return;
         }
-       */
-        cachedChess.put(roomId, chess);
     }
 
     private ChessDto makeChessDto(Chess chess) {

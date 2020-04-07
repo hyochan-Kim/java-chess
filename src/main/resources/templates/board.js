@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }, timeOutTerm);
 
-    $('.btn-surrender').click(function () {
+    $('.btn-quit').click(function () {
         $.ajax({
             type: "POST",
             url: "/room/quit",
@@ -87,23 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    $('.btn-end').click(function () {
-        $.ajax({
-            type: "POST",
-            url: "/room/exit",
-            async: true,
-            data: {
-                roomId: roomId
-            },
-            success: function (data) {
-                console.log(data);
-                window.location.href = "index.html"
-            },
-            error: function (e) {
-                console.log(e.message);
-            }
-        });
-    });
 
     $('.square').click(function () {
         if (click_flag === 0) {

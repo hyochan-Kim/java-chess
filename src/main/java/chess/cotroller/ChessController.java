@@ -30,7 +30,6 @@ public class ChessController {
 
     public Object getMovableWay(Request request, Response response) {
         int roomId = Integer.parseInt(request.queryParams("roomId"));
-        System.out.println("####" + roomId);
         Team team = Team.valueOf(request.queryParams("team"));
         Coordinate coordinate = Coordinate.of(request.queryParams("coordinate"));
         Result result = chessService.getMovableWay(roomId, team, coordinate);

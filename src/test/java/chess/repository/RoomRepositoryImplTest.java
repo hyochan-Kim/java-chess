@@ -1,7 +1,5 @@
 package chess.repository;
 
-import chess.domain.coordinate.Coordinate;
-import chess.dto.MoveDto;
 import chess.dto.RoomDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +9,7 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MoveRepositoryImplTest {
+public class RoomRepositoryImplTest {
     private MoveRepository moveRepository;
     private RoomRepository roomRepository;
 
@@ -28,21 +26,27 @@ class MoveRepositoryImplTest {
     }
 
     @Test
-    void add() throws SQLException {
+    void create() throws SQLException {
         RoomDto roomDto = new RoomDto();
-        int roomId = (int) roomRepository.create(roomDto).getObject();
-        MoveDto moveDto = new MoveDto(roomId, Coordinate.of("a1"), Coordinate.of("b2"));
-        assertThat(moveRepository.add(moveDto).isSuccess()).isTrue();
+        assertThat(roomRepository.create(roomDto).isSuccess()).isTrue();
     }
 
     @Test
     void findById() throws SQLException {
         RoomDto roomDto = new RoomDto();
         int roomId = (int) roomRepository.create(roomDto).getObject();
-        MoveDto moveDto = new MoveDto(roomId, Coordinate.of("a1"), Coordinate.of("b2"));
-        int moveId = (int) moveRepository.add(moveDto).getObject();
-        moveDto.setMoveId(moveId);
-        MoveDto moveDto1 = (MoveDto) (moveRepository.findById(moveId).getObject());
-        assertThat(moveDto1).isEqualTo(moveDto);
+        roomDto.setRoomId(roomId);
+        RoomDto roomDto1 = (RoomDto) (roomRepository.findById(roomId).getObject());
+        assertThat(roomDto1).isEqualTo(roomDto);
+    }
+
+    @Test
+    void findByName() throws SQLException {
+        RoomDto roomDto = new RoomDto();
+        roomDto.setName("test");
+        int roomId = (int) roomRepository.create(roomDto).getObject();
+        roomDto.setRoomId(roomId);
+        RoomDto roomDto1 = (RoomDto) (roomRepository.findByName("test").getObject());
+        assertThat(roomDto1).isEqualTo(roomDto);
     }
 }

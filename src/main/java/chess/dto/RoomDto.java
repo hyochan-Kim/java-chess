@@ -1,6 +1,12 @@
 package chess.dto;
 
+import java.util.Objects;
+
 public class RoomDto {
+    public static final int DEFAULT_ROOM_ID = -1;
+    public static final int DEFAULT_USER_ID = -1;
+    public static final String DEFAULT_NAME = "default";
+
     private int roomId;
     private String name;
     private int blackUserId;
@@ -16,7 +22,7 @@ public class RoomDto {
     }
 
     public RoomDto() {
-        this(-1, -1, -1, false, "default");
+        this(DEFAULT_ROOM_ID, DEFAULT_USER_ID, DEFAULT_USER_ID, false, DEFAULT_NAME);
     }
 
     public int getRoomId() {
@@ -57,5 +63,22 @@ public class RoomDto {
 
     public void setEnd(boolean end) {
         isEnd = end;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoomDto roomDto = (RoomDto) o;
+        return roomId == roomDto.roomId &&
+                blackUserId == roomDto.blackUserId &&
+                whiteUserId == roomDto.whiteUserId &&
+                isEnd == roomDto.isEnd &&
+                Objects.equals(name, roomDto.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roomId, name, blackUserId, whiteUserId, isEnd);
     }
 }

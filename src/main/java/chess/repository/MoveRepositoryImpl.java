@@ -18,13 +18,14 @@ public class MoveRepositoryImpl implements MoveRepository {
     @Override
     public Result add(MoveDto moveDto) throws SQLException {
         String query = "INSERT INTO move VALUES (?, ?, ?, ?)";
+        int moveId = IdGenerator.generateMoveId();
         PreparedStatement pstmt = getConnection().prepareStatement(query);
-        pstmt.setInt(1, IdGenerator.generateMoveId());
+        pstmt.setInt(1, moveId);
         pstmt.setInt(2, moveDto.getRoomId());
         pstmt.setString(3, moveDto.getSource().toString());
         pstmt.setString(4, moveDto.getTarget().toString());
         pstmt.executeUpdate();
-        return new Result(true, null);
+        return new Result(true, moveId);
     }
 
     @Override
@@ -38,15 +39,16 @@ public class MoveRepositoryImpl implements MoveRepository {
             return new Result(false, null);
         }
 
-        return new Result(true,
-                new MoveDto(rs.getInt("id"),
-                        Coordinate.of(rs.getString("source")),
-                        Coordinate.of(rs.getString("target"))));
+        MoveDto moveDto = new MoveDto(rs.getInt("room_id"),
+                Coordinate.of(rs.getString("source")),
+                Coordinate.of(rs.getString("target")));
+        moveDto.setMoveId(rs.getInt("id"));
+        return new Result(true, moveDto);
     }
 
     @Override
     public Result findByRoomId(int roomId) throws SQLException {
-        String query = "SELECT * FROM move WHERE room_id = ?";
+        String query = "SELECT * FROM move WHERE room_id = ? ORDER BY id ASC;";
         PreparedStatement pstmt = getConnection().prepareStatement(query);
         pstmt.setInt(1, roomId);
         ResultSet rs = pstmt.executeQuery();
@@ -55,11 +57,11 @@ public class MoveRepositoryImpl implements MoveRepository {
             return new Result(false, null);
         }
         List<MoveDto> moveDtos = new ArrayList<>();
-        while (rs.next()) {
-            moveDtos.add(new MoveDto(rs.getInt("id"),
+        do {
+            moveDtos.add(new MoveDto(rs.getInt("room_id"),
                     Coordinate.of(rs.getString("source")),
                     Coordinate.of(rs.getString("target"))));
-        }
+        } while (rs.next());
         return new Result(true, moveDtos);
     }
 
